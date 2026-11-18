@@ -41,6 +41,11 @@ failure extension exactly.
 **M4. Instantiation as an effect.** Parent records "this child exists" as one of its inverses, so unloading a
 parent retires children one level at a time.
 Acceptance: a three-level tree unloads leaves-first with no manager code.
+**Done.** `ctx.Add` tracks the same `AddChange` the host uses, into the parent's activation scope, so the
+child's existence is one of the parent's inverses, ordered at creation time. Unloading or retiring a parent
+retires children through the accumulator fold, leaves first; a reactivated parent instantiates them fresh.
+`Fiber` deliberately has no Parent field: the ordering comes from the fold, and a parent pointer is
+bookkeeping nothing reads yet. It earns its place when the M6 loader wants a configuration tree.
 
 **M5. Verification harness (a .NET advantage).** Snapshot the tracked state before loading and diff it after
 unloading, so a sloppy inverse fails a test instead of leaking silently.

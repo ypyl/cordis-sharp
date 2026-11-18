@@ -43,6 +43,9 @@ internal sealed class ComponentContext : IComponentContext
     public ValueTask<TrackedChange> Provide<T>(T instance) where T : class =>
         _scope.Track(() => _host.ProvideChange(typeof(T), instance!, _fiber));
 
+    public ValueTask<TrackedChange> Add(IComponent child) =>
+        _scope.Track(() => _host.AddChange(child));
+
     public ValueTask<TrackedChange> Track(Func<ValueTask<Func<ValueTask>>> change) =>
         _scope.Track(change);
 

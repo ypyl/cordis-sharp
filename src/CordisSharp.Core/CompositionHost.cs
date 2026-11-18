@@ -105,7 +105,7 @@ public sealed class CompositionHost : IAsyncDisposable
         await Notify(key).ConfigureAwait(false);
     }
 
-    private async ValueTask<Func<ValueTask>> AddChange(IComponent spec)
+    internal async ValueTask<Func<ValueTask>> AddChange(IComponent spec)
     {
         var fiber = new Fiber(spec);
         _instances.Add(fiber);

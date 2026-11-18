@@ -12,13 +12,15 @@ implementation.
 
 ## Status
 
-**M1, M2 and M3 implemented.** `src/CordisSharp.Core` now has the revertible-effects primitive
+**M1, M2, M3 and M4 implemented.** `src/CordisSharp.Core` now has the revertible-effects primitive
 (`EffectScope`, `TrackedChange`, `EffectLoop`), the reactive registry (`CompositionHost`, `IComponent`,
 `IComponentContext`) and the fiber lifecycle on top: public `FiberState` with `StateOf`/`FailureOf`,
 `Retire` separate from removal, component-provided bindings via `ctx.Provide`, two-phase teardown that
 runs dependents recursively before the provider's accumulator, and recorded activation failures that
-do not fail the triggering call. Tests cover all three milestones' acceptance cases. Next: M4,
-instantiation as an effect.
+do not fail the triggering call. `ctx.Add` makes a child's existence a tracked change of the parent's
+activation scope, so unloading a parent retires children leaves-first with no manager code, and a
+reactivated parent instantiates them fresh. Tests cover all milestones' acceptance cases. Next: M5,
+the verification harness.
 
 ## How to read this folder
 

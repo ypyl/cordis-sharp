@@ -20,4 +20,12 @@ public interface IComponentContext : IEffectScope
     /// dependents are done. Provider identity is a fresh uid per call, never reused.
     /// </summary>
     ValueTask<TrackedChange> Provide<T>(T instance) where T : class;
+
+    /// <summary>
+    /// Instantiate a child component. The child's existence is a tracked change of this
+    /// component's own activation scope: unloading or retiring the parent retires the
+    /// child, one level at a time, leaves first, with no manager code. The returned
+    /// handle's inverse retires and removes the child directly.
+    /// </summary>
+    ValueTask<TrackedChange> Add(IComponent child);
 }
