@@ -11,6 +11,9 @@ LIFO recovery, fire-at-most-once, the iterator form. No dependencies, no fibers.
 Acceptance: a test that loads three things, disposes out of order, and asserts exactly one reversal per
 change; plus a test that interrupting halfway reverses only what ran.
 Value: usable immediately anywhere teardown is a hand-written `Dispose`.
+**Done.** `EffectScope`, `TrackedChange`, `EffectLoop`, both acceptance tests plus edge cases. The child
+fold already retires grandchildren one level at a time, so M4's mechanism exists here for scopes and
+only needs to be attached to fibers.
 
 **M2. Declared keys and a reactive registry.** Keys as interfaces, an explicit declared set per component, a
 registry keyed by provider, and a target view keyed by provider identity. A component whose keys are missing
@@ -48,8 +51,10 @@ unless checked.
    ergonomics? The generator is more work and more magic.
 3. **Teardown order.** Sequential LIFO for predictability, or concurrent to match the reference
    implementation? Concurrent is faster and considerably harder to reason about.
+   **Decided for M1: sequential LIFO.**
 4. **Cancellation.** One `CancellationToken` per fiber (abort mid-activation), or only between iterations?
    The paper's inertial hosts suggest between iterations.
+   **Decided for M1: between iterations only.**
 5. **Multiple providers.** Single provider as in the paper, with a broker for multiplicity, or allow
    collections from the start?
 6. **Scope of the dependency table.** Only inter-component services, or also host resources (config, clock,

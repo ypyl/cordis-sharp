@@ -12,8 +12,11 @@ implementation.
 
 ## Status
 
-**Documentation only.** No code yet. The implementation is being built step by step, discussed before
-each piece is written.
+**M1 implemented.** The revertible-effects primitive exists: `src/CordisSharp.Core` has `EffectScope`
+(track, recover, nested child scopes), `TrackedChange` (sync and async dispose, fire at most once) and
+`EffectLoop` (the effect iterator, cancelled between steps only, unwinding what ran). Tests in
+`tests/CordisSharp.Core.Tests` cover the acceptance cases from the plan. Next: M2, declared keys and a
+reactive registry.
 
 ## How to read this folder
 
