@@ -30,6 +30,13 @@ teardown exists to fix.
 separate from remove, dependents-first waiting.
 Acceptance: unload ordering is observable and asserted; a component that reads its dependency during its own
 teardown succeeds.
+**Done.** `FiberState` is public and observable via `StateOf`/`FailureOf`; `Retire` does two-phase teardown but
+keeps the fiber registered, removal stays the inverse of `Add`. `IComponentContext.Provide` makes a fiber a
+provider: its bindings are tracked changes of its own activation scope, so deactivation withdraws them after
+dependents have gone, recursively. Inertia needed no machinery: the engine is sequential and awaited, so a
+fiber mid-Loading is never observable. Activation failure is recorded on the fiber and does not fail the
+calling `Add`/`Provide`; a failed fiber retries only when the registry actually changes, which is the paper's
+failure extension exactly.
 
 **M4. Instantiation as an effect.** Parent records "this child exists" as one of its inverses, so unloading a
 parent retires children one level at a time.

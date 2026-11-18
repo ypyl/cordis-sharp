@@ -129,13 +129,17 @@ public sealed class CompositionHostTests
     }
 
     [Fact]
-    public async Task An_undeclared_access_throws()
+    public async Task An_undeclared_access_fails_the_fiber_not_the_call()
     {
         var host = new CompositionHost();
         await host.Provide<IDb>(new Db("a"));
 
         var sneaky = new Sneaky();
-        await Assert.ThrowsAsync<InvalidOperationException>(() => host.Add(sneaky).AsTask());
+        await host.Add(sneaky);
+
+        // The call completes; the bug is recorded on the fiber.
+        Assert.Equal(FiberState.Failed, host.StateOf(sneaky));
+        Assert.IsType<InvalidOperationException>(host.FailureOf(sneaky));
     }
 
     [Fact]

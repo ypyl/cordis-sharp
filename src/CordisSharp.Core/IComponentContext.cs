@@ -12,4 +12,12 @@ public interface IComponentContext : IEffectScope
     /// missing dependency.
     /// </summary>
     T Get<T>() where T : class;
+
+    /// <summary>
+    /// Install or replace a binding for the key <typeparamref name="T"/>. The binding is a
+    /// tracked change of this component's own activation scope, so deactivating the component
+    /// withdraws it, and two-phase teardown makes that withdrawal happen only after its
+    /// dependents are done. Provider identity is a fresh uid per call, never reused.
+    /// </summary>
+    ValueTask<TrackedChange> Provide<T>(T instance) where T : class;
 }
