@@ -65,6 +65,12 @@ sealed class Fiber {
 - `IAsyncEnumerable` for the iterator, `CancellationToken` for interruption.
 - Roslyn source generators for the declaration and accessors, which is the paper's own suggestion in 6.4 for
   dispensing with runtime interposition.
+- **`AssemblyDependencyResolver`.** Resolves a plugin's own dependencies from its `*.deps.json` so each ALC
+  stays self-contained and two plugins can depend on different versions of the same package. Without it,
+  the default context silently absorbs the first version anyone asks for.
+- **Shadow-copying.** The CLR memory-maps a loaded assembly, so the DLL file is locked while loaded. "Replace
+  the file, then reload" fails until you copy the binaries somewhere fresh and load the copy. This is the
+  load half of hot replacement, and it is boring plumbing that still has to be built.
 - **Verification.** The paper's weakest point is unchecked inverses. Here you can snapshot the tracked state
   before loading a component and diff it after unloading, in tests or in debug builds. The guarantee gets an
   actual check behind it, which the reference implementation does not have.
@@ -90,6 +96,13 @@ sealed class Fiber {
   restart goes back to section 1.2.3.
 - **`IFeatureCollection` (ASP.NET Core).** A typed map with presence checks scoped to a request, and nothing
   reacts to changes.
+- **McMaster.NETCore.Plugins.** The best-known community wrapper around ALCs (13M+ NuGet downloads,
+  1.8k stars). It went dormant from 2021 to 2024 while its sole maintainer publicly lost interest and
+  considered archiving it, then revived as v2.0.0 in January 2025 for .NET 8, and since then gets light
+  but real maintenance from a maintainer plus occasional contributors. Two lessons: a thin wrapper over
+  stdlib ALC loading is useful enough to earn millions of downloads, and nobody has rushed to build
+  anything more ambitious on top, which says something about demand for in-process hot replacement. It
+  advertises hot reload support, so it is the first thing to test in M7.
 
 ## What fights back
 
@@ -97,7 +110,10 @@ sealed class Fiber {
    Static fields, thread statics, cached delegates, timer callbacks, unresolved task continuations and event
    handlers on long-lived objects all pin it. A fiber's committed view holds references into the context,
    which in .NET means holding references into the ALC. You need weak references or per-ALC proxy types, and
-   this is the single biggest risk to a port.
+   this is the single biggest risk to a port. On top of that, `Unload()` is best-effort: it returns
+   immediately, the context dies only at a GC that finds it unreferenced, and failure is silent. The standard
+   confirmation is a `WeakReference` to the context checked after forcing collections, so "unloaded" must be
+   an observed outcome, never an assumption.
 2. **Type identity across reloads.** Two collectible contexts loading the same assembly produce distinct
    `Type` objects, so a store keyed on `Type` cannot see across them. The standard fix is a contract assembly
    in the default context, which weakens the nominal-typing advantage.

@@ -36,6 +36,9 @@ Optional, and only if a use case earns it.
 
 **M7. Code reload investigation.** Collectible `AssemblyLoadContext`, contract assemblies, type identity
 across reloads. Time-boxed and explicitly allowed to conclude "not worth it".
+Acceptance: the unload is *observed*, not assumed. Keep a `WeakReference` to the context, force collections,
+and assert it died. A collectible ALC that silently never collects is indistinguishable from success
+unless checked.
 
 ## Decisions to make together
 
