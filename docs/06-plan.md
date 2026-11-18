@@ -20,6 +20,11 @@ registry keyed by provider, and a target view keyed by provider identity. A comp
 parks instead of throwing.
 Acceptance: component B declares what A provides, B activates only after A, swapping A for a second instance
 reactivates B even though the value is equal, and an undeclared access throws.
+**Done.** `CompositionHost`, `IComponent`, `IComponentContext`; keys are interfaces, provider identity
+is a fresh uid per `Provide`, and both `Provide` and `Add` are tracked effects of the root scope, so host
+disposal already unwinds dependents before providers. One known simplification: a provider withdrawn by
+its own handle deactivates dependents after the binding is gone, which is exactly what M3's two-phase
+teardown exists to fix.
 
 **M3. Fiber lifecycle and two-phase teardown.** States, inertia, committed view versus target, retire
 separate from remove, dependents-first waiting.
@@ -47,8 +52,11 @@ unless checked.
 
 1. **Keys.** Interfaces as keys, string service names as in Cordis, or both? Interfaces give compile-time
    safety; names give late binding and configuration.
+   **Decided for M2: interfaces only.** String names can be added later as a wrapper; the reverse direction
+   would be a breaking change.
 2. **Access.** Explicit `ctx.Get<T>()` with a chain walk, or source-generated accessors that keep `ctx.Db`
    ergonomics? The generator is more work and more magic.
+   **Decided for M2: explicit `Get`.** The generator stays possible later; it is ergonomics, not semantics.
 3. **Teardown order.** Sequential LIFO for predictability, or concurrent to match the reference
    implementation? Concurrent is faster and considerably harder to reason about.
    **Decided for M1: sequential LIFO.**
@@ -63,6 +71,7 @@ unless checked.
    boundary rule will silently exclude them.
 8. **Error policy.** Park on missing dependency (the paper) or fail fast (what most .NET developers expect)?
    Parking is the point of the design, but it changes how people debug.
+   **Decided for M2: park.** Undeclared access still throws; that is a bug, not a missing dependency.
 
 ## What this project is not
 

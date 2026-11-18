@@ -12,11 +12,12 @@ implementation.
 
 ## Status
 
-**M1 implemented.** The revertible-effects primitive exists: `src/CordisSharp.Core` has `EffectScope`
-(track, recover, nested child scopes), `TrackedChange` (sync and async dispose, fire at most once) and
-`EffectLoop` (the effect iterator, cancelled between steps only, unwinding what ran). Tests in
-`tests/CordisSharp.Core.Tests` cover the acceptance cases from the plan. Next: M2, declared keys and a
-reactive registry.
+**M1 and M2 implemented.** `src/CordisSharp.Core` now has the revertible-effects primitive
+(`EffectScope`, `TrackedChange`, `EffectLoop`) and the reactive registry on top of it
+(`CompositionHost`, `IComponent`, `IComponentContext`): interface keys, provider identity as a
+never-reused uid, committed-view `Get`, parking on missing keys, a swap that reactivates dependents
+even when the value is equal. Tests cover both milestones' acceptance cases. Next: M3, fiber
+lifecycle and two-phase teardown.
 
 ## How to read this folder
 
