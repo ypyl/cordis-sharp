@@ -62,6 +62,14 @@ public sealed class CompositionHost : IAsyncDisposable
     /// <summary>Recover the root scope: the whole composition, undone LIFO.</summary>
     public ValueTask DisposeAsync() => _root.RecoverAsync();
 
+    /// <summary>The current bindings, for the verification harness. Ordered by key name, so
+    /// two readings are comparable.</summary>
+    internal IReadOnlyList<(Type Key, object Value, long Uid)> RegistryView() =>
+        _bindings
+            .Select(b => (b.Key, b.Value.Value, b.Value.Uid))
+            .OrderBy(b => b.Key.FullName ?? b.Key.Name)
+            .ToList();
+
     private Fiber? Find(IComponent component) => _instances.FirstOrDefault(f => f.Spec == component);
 
     /// <summary>

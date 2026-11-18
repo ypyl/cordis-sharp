@@ -50,6 +50,12 @@ bookkeeping nothing reads yet. It earns its place when the M6 loader wants a con
 **M5. Verification harness (a .NET advantage).** Snapshot the tracked state before loading and diff it after
 unloading, so a sloppy inverse fails a test instead of leaking silently.
 Acceptance: a deliberately wrong inverse is caught.
+**Done.** `VerificationHarness.Watch` names the pieces of environment a test cares about, and the harness
+refuses to guess the rest: whatever is unwatched is untracked, which makes the boundary visible instead of
+implied. The registry is always watched because the host owns it. `Capture` holds probe values plus the
+registry view; `Verify` throws once with every difference listed. Deliberately not verified: fiber states,
+which legitimately churn through deactivate-reactivate cycles, so sameness is neither necessary nor
+sufficient.
 
 **M6. Declarative loader and reconciliation.** Desired composition as data, per-field reconciliation.
 Optional, and only if a use case earns it.
