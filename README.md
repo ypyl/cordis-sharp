@@ -65,3 +65,30 @@ Two questions, both practical:
 2. Which parts of it are possible in .NET, which are awkward, and which are not worth it? The honest answer
    so far: effects and reactive dependencies are ordinary engineering, code unloading is against the grain
    of the CLR, and verification is *easier* here than in TypeScript.
+
+## When the mechanism earns its keep
+
+The economic test the paper never states:
+
+```
+removal frequency  x  state-rebuild cost  >  cost of maintaining the discipline
+```
+
+If components are removed monthly and a restart takes ten seconds, kill-and-restart is simply correct,
+and the track-everything tax buys nothing. That covers most software. The fine-grained mechanism pays
+only where components arrive and leave while the process keeps running:
+
+- **Agent harnesses** that install, swap, and remove tools mid-session. The paper's own motivating
+case: an orchestrator that modifies its own component set cannot afford a process restart per change.
+- **Long-lived plugin hosts**: chatbots (Koishi, four years, 4000+ plugins), in-app scripting, workflow
+engines that load steps at runtime, trading and charting platforms.
+- **Multi-tenant services with per-tenant modules**, where a restart per change makes one tenant's click
+everyone's outage.
+- **Test and dev tooling**: `EffectScope` alone is RAII with a real undo, and the harness catches sloppy
+teardown that would otherwise leak silently. Useful in any codebase with hand-written `Dispose` chains.
+
+The honest limits, stated plainly: this is in-process reversibility. An un-sent HTTP request stays
+un-sent, and anything cross-process goes back to the coarse mechanism, chosen deliberately at the
+boundary rather than pretended away. As a product this repo ships nothing. As the substrate for a
+runtime-mutable component system, an agent harness being the live candidate, the parts worth taking are
+the effect primitive, the registry, two-phase teardown, and the verification harness.
