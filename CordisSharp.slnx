@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/samples/">
+    <Project Path="samples/CordisSharp.Demo/CordisSharp.Demo.csproj" />
+  </Folder>
   <Folder Name="/src/">
     <Project Path="src/CordisSharp.Core/CordisSharp.Core.csproj" />
   </Folder>

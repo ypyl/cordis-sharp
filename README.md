@@ -45,6 +45,15 @@ declare dependencies and the runtime reactivates them when providers change. It 
 context, and proves the guarantees carry from one component to a whole interleaved system. The
 implementation is Cordis, a TypeScript meta-framework used by Koishi and its 4000+ plugins.
 
+## Demo
+
+`samples/CordisSharp.Demo` is a console walk through the whole runtime in one session: a component
+that parks with no provider, a dependency chain activating in order, a retire that tears dependents
+down before the provider's resource is disposed, a parked dependent revived by a fresh provider, a
+parent whose children exist as its own recorded effects, a failing component whose error is recorded
+while the host keeps running, and the verification harness confirming at the end that nothing leaked.
+Run it with `dotnet run --project samples/CordisSharp.Demo`.
+
 ## Why this project exists
 
 Two questions, both practical:
