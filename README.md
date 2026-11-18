@@ -53,6 +53,8 @@ down before the provider's resource is disposed, a parked dependent revived by a
 parent whose children exist as its own recorded effects, a failing component whose error is recorded
 while the host keeps running, and the verification harness confirming at the end that nothing leaked.
 Run it with `dotnet run --project samples/CordisSharp.Demo`.
+A guide to the core library that follows this demo section by section lives at
+`samples/CordisSharp.Demo/GUIDE.md`.
 
 ## Why this project exists
 
